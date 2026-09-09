@@ -1,0 +1,104 @@
+
+<div class="card p-4">
+  <div class="mb-3">
+
+    <div>
+        <h1 class="text-center">Listado de películas</h1>
+    </div>
+    <span class="p-input-icon-left">
+      <input
+        pInputText
+        type="text"
+        [ngModel]="filterValue()"
+        (ngModelChange)="filterValue.set($event)"
+        placeholder="Buscar por titulo"
+      />
+      <i class="pi pi-search px-2"></i>
+    </span>
+  </div>
+
+  
+
+  <div class="mb-3 text-muted">
+    Mostrando página {{ currentPage() }} de {{ totalPages() }} · Total de resultados: {{ totalResults() }}
+  </div>
+
+  <p-table
+    [value]="displayedMovies()"
+   
+    responsiveLayout="scroll"
+    (onSort)="onSort($event)"
+  >
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="id" style="width: 5%;">Id <p-sort-icon field="id"></p-sort-icon></th>
+        <th pSortableColumn="title" style="width: 20%;">Título <p-sort-icon field="title"></p-sort-icon></th>
+        <th pSortableColumn="release_date" style="width: 20%;">Fecha de lanzamiento<p-sort-icon field="release_date"></p-sort-icon></th>
+        <th pSortableColumn="popularity" style="width: 20%;">Popularidad<p-sort-icon field="popularity"></p-sort-icon></th>
+        <th style="width: 5%;">Acciones</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-movie>
+      <tr>
+        <td>{{ movie.id }}</td>
+        <td>{{ movie.title ?? movie.name ?? 'Sin título' }}</td>
+        <td>{{ movie.release_date ?? movie.first_air_date ?? 'Sin fecha' }}</td>
+        <td>{{ movie.popularity ?? 0 }}</td>
+        <td>
+          <div class="d-flex justify-content-center">
+            <p-button
+              icon="pi pi-eye"
+              class="px-1"
+              [rounded]="true"
+              severity="info"
+              (onClick)="openMovie(movie)"
+            />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template #empty>
+      <tr>
+        <td colspan="4" class="text-center">No se encontraron películas.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <div class="d-flex justify-content-center mt-3 gap-2">
+    <button type="button" class="btn btn-outline-primary" [disabled]="currentPage() === 1" (click)="prevPage()">
+      Anterior
+    </button>
+
+    <span class="align-self-center">Página {{ currentPage() }} / {{ totalPages() }}</span>
+
+    <button type="button" class="btn btn-outline-primary" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">
+      Siguiente
+    </button>
+  </div>
+
+<p-dialog
+  [visible]="openDialog()"
+  (visibleChange)="openDialog.set($event)"
+  [style]="{width: '800px'}"
+  header="Detalle de la película"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+
+    @if (selectedMovie(); as movie) {
+    <div class="p-3 border rounded bg-light">
+      <p><strong>Id:</strong> {{ movie.id }}</p>
+      <p><strong>Título:</strong> {{ movie.title ?? movie.name }}</p>
+      <p><strong>Fecha de lanzamiento:</strong> {{ movie.release_date ?? movie.first_air_date ?? 'Sin fecha' }}</p>
+      <p><strong>Descripción:</strong> {{ movie.overview || 'Sin descripción disponible' }}</p>
+    </div>
+  }
+
+    <ng-template #footer>
+        <button type="button" class="btn btn-danger" (click)="closeDialog()">Cerrar</button>
+    </ng-template>
+</p-dialog>
+
+</div>
